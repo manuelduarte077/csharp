@@ -4,6 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>disable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,8 +21,6 @@
     <ItemGroup>
         <Folder Include="Controllers\"/>
         <Folder Include="MapperMovie\"/>
-        <Folder Include="Models\Dtos\"/>
-        <Folder Include="Repository\IRepository\"/>
     </ItemGroup>
 
 </Project>
