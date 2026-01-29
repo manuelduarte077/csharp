@@ -1,18 +1,4 @@
 services:
-  movieapi:
-    image: movieapi
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__SQLConnection=Server=sqlserver,1433;Database=MovieApi;User Id=sa;Password=s3cret-Ninja;Encrypt=False;TrustServerCertificate=True;
-    ports:
-      - "8080:8080"
-    depends_on:
-      - sqlserver
-
   sqlserver:
     image: mcr.microsoft.com/azure-sql-edge:latest
     environment:
@@ -25,4 +11,3 @@ services:
 
 volumes:
   sqlserver_data:
-
