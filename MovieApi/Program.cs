@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using MovieApi.Data;
+using MovieApi.MapperMovie;
+using MovieApi.Repository;
+using MovieApi.Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,8 +11,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnection")));
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Add repositories
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+// Add mappers
+builder.Services.AddAutoMapper(cfg => { }, typeof(MapperMovies));
 
 var app = builder.Build();
 
@@ -17,7 +25,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwaggerUi(options => { options.DocumentPath = "/openapi/v1.json"; });
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "MovieApi v1");
+    });
 }
 
 app.UseHttpsRedirection();
