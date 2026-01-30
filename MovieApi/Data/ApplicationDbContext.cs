@@ -11,4 +11,5 @@ public class ApplicationDbContext : DbContext
 
     // Agregar las entidades (Models)
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Movie> Movies { get; set; }
 }

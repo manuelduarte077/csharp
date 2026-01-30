@@ -32,7 +32,7 @@ public class CategoryRepository : ICategoryRepository
     public bool CategoryExists(string nameCategory)
     {
         var categoryExists = _dbContext.Categories.Any(c => c.Name.ToLower().Trim() == nameCategory.ToLower().Trim());
-        return categoryExists;
+        return categoryExists;  
     }
 
     public bool CategoryCreate(Category category)

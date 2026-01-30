@@ -121,6 +121,18 @@ namespace MovieApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeleteCategory(int id)
         {
+            if (!_ctRepo.CategoryExists(id))
+            {
+                return NotFound();
+            }
+
+            var category = _ctRepo.GetCategory(id);
+            if (!_ctRepo.CategoryDelete(category))
+            {
+                ModelState.AddModelError("", $"Category delete failed: {category.Name}");
+                return StatusCode(500, ModelState);
+            }
+
             return NoContent();
         }
     }
