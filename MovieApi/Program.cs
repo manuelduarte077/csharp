@@ -21,6 +21,16 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Add mappers
 builder.Services.AddAutoMapper(cfg => { }, typeof(MapperMovies));
 
+
+// CORS
+builder.Services.AddCors(p =>
+    p.AddPolicy("CorsPolicy", build =>
+        build.WithOrigins("http://localhost:5205")
+            .AllowAnyMethod()
+            .AllowAnyHeader())
+);
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,6 +41,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 

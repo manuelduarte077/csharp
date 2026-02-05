@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MovieApi.Models;
 using MovieApi.Models.Dtos;
@@ -8,6 +9,7 @@ namespace MovieApi.Controllers
 {
     [Route("api/categories")]
     [ApiController]
+    // [EnableCors("CorsPolicy")]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryRepository _ctRepo;
@@ -22,6 +24,7 @@ namespace MovieApi.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        // [EnableCors("CorsPolicy")]
         public IActionResult GetCategories()
         {
             var categoryList = _ctRepo.GetCategories();
