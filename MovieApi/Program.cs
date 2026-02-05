@@ -15,6 +15,7 @@ builder.Services.AddOpenApi();
 
 // Add repositories
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 
 // Add mappers
 builder.Services.AddAutoMapper(cfg => { }, typeof(MapperMovies));
@@ -25,10 +26,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "MovieApi v1");
-    });
+    app.UseSwaggerUI(options => { options.SwaggerEndpoint("/openapi/v1.json", "MovieApi v1"); });
 }
 
 app.UseHttpsRedirection();

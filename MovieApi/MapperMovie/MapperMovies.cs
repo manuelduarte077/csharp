@@ -10,5 +10,8 @@ public class MapperMovies : Profile
     {
         CreateMap<Category, CategoryDto>().ReverseMap();
         CreateMap<Category, CreateCategoryDto>().ReverseMap();
+
+        CreateMap<Movie, MovieDto>().ReverseMap();
+        CreateMap<Movie, CreateMovieDto>().ReverseMap();
     }
-} 
+}
