@@ -16,6 +16,7 @@ builder.Services.AddOpenApi();
 // Add repositories
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Add mappers
 builder.Services.AddAutoMapper(cfg => { }, typeof(MapperMovies));
