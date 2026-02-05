@@ -1,5 +1,5 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApi.Models;
 using MovieApi.Models.Dtos;
@@ -7,6 +7,7 @@ using MovieApi.Repository.IRepository;
 
 namespace MovieApi.Controllers
 {
+    // [Authorize(Roles = "Admin")]
     [Route("api/categories")]
     [ApiController]
     // [EnableCors("CorsPolicy")]
@@ -55,6 +56,7 @@ namespace MovieApi.Controllers
             return Ok(itemCategoryDto);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -88,7 +90,7 @@ namespace MovieApi.Controllers
             return CreatedAtRoute("GetCategory", new { id = category.Id }, category);
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPatch("{id:int}", Name = "UpdateCategory")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -116,6 +118,7 @@ namespace MovieApi.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}", Name = "DeleteCategory")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

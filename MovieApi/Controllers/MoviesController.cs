@@ -1,5 +1,6 @@
 using System.Collections;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieApi.Models;
 using MovieApi.Models.Dtos;
@@ -20,6 +21,7 @@ namespace MovieApi.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -36,6 +38,7 @@ namespace MovieApi.Controllers
             return Ok(movieDto);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id:int}", Name = "GetMovie")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -53,6 +56,7 @@ namespace MovieApi.Controllers
             return Ok(itemMovieDto);
         }
 
+        [AllowAnonymous]
         [HttpGet("GetMoviesByCategory/{categoryId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -74,6 +78,7 @@ namespace MovieApi.Controllers
             return Ok(movieItemDto);
         }
 
+        [AllowAnonymous]
         [HttpGet("SearchMovies")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -96,7 +101,7 @@ namespace MovieApi.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(MovieDto))]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -131,6 +136,7 @@ namespace MovieApi.Controllers
             return CreatedAtRoute("GetMovie", new { id = movie.Id }, movie);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("{id:int}", Name = "UpdateMovie")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -164,12 +170,12 @@ namespace MovieApi.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}", Name = "DeleteMovie")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeleteMovie(int id)
         {
             if (!_movieRepo.MovieExists(id))
