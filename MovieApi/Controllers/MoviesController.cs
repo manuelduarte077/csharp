@@ -1,4 +1,4 @@
-using System.Collections;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,8 +8,9 @@ using MovieApi.Repository.IRepository;
 
 namespace MovieApi.Controllers
 {
-    [Route("api/movies")]
+    [Route("api/v{version:apiVersion}/movies")]
     [ApiController]
+    [ApiVersion("2.0")]
     public class MoviesController : ControllerBase
     {
         private readonly IMovieRepository _movieRepo;
@@ -23,6 +24,7 @@ namespace MovieApi.Controllers
 
         [AllowAnonymous]
         [HttpGet]
+        [ResponseCache(Duration = 20)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetMovies()

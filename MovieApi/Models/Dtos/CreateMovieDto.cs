@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using MovieApi.Utils;
 
 namespace MovieApi.Models.Dtos;

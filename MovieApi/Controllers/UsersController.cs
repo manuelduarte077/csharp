@@ -1,4 +1,5 @@
 using System.Net;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,8 +9,9 @@ using MovieApi.Repository.IRepository;
 
 namespace MovieApi.Controllers;
 
-[Route("api/users")]
+[Route("api/v{version:apiVersion}/users")]
 [ApiController]
+[ApiVersion("2.0")]
 public class UsersController : ControllerBase
 {
     private readonly IUserRepository _userRepo;
@@ -25,6 +27,7 @@ public class UsersController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
+    [ResponseCache(CacheProfileName = "Default")]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetUsers()
@@ -42,6 +45,7 @@ public class UsersController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpGet("{id:int}", Name = "GetUser")]
+    [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

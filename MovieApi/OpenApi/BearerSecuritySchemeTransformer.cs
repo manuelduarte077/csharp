@@ -20,7 +20,7 @@ internal sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvi
         {
             Type = SecuritySchemeType.Http,
             Name = "Authorization",
-            Scheme = "Bearer",
+            Scheme = "bearer",
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
             Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\""
@@ -29,11 +29,12 @@ internal sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvi
         document.Components ??= new OpenApiComponents();
         document.AddComponent("Bearer", bearerScheme);
 
-        // Hace que Swagger UI envíe el token en cada petición (Authorization: Bearer {token})
         var securityRequirement = new OpenApiSecurityRequirement
         {
             [new OpenApiSecuritySchemeReference("Bearer", document)] = []
         };
+
+        if (document.Paths is null) return;
 
         foreach (var pathItem in document.Paths.Values)
         {

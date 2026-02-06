@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,10 +8,10 @@ using MovieApi.Repository.IRepository;
 
 namespace MovieApi.Controllers
 {
-    // [Authorize(Roles = "Admin")]
-    [Route("api/categories")]
+    [Route("api/v{version:apiVersion}/categories")]
     [ApiController]
-    // [EnableCors("CorsPolicy")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryRepository _ctRepo;
@@ -22,7 +23,9 @@ namespace MovieApi.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpGet]
+        [ResponseCache(CacheProfileName = "Default")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         // [EnableCors("CorsPolicy")]
@@ -39,7 +42,9 @@ namespace MovieApi.Controllers
             return Ok(categoryDto);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id:int}", Name = "GetCategory")]
+        [ResponseCache(CacheProfileName = "Default")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
