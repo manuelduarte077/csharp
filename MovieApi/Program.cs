@@ -83,27 +83,31 @@ builder.Services.AddAuthentication(auth =>
 });
 
 
-// CORS
-builder.Services.AddCors(p =>
-    p.AddPolicy("CorsPolicy", build =>
-        build.WithOrigins("http://localhost:5205")
-            .AllowAnyMethod()
-            .AllowAnyHeader())
-);
+// CORS: orígenes desde configuración (appsettings.json por entorno). Con AllowCredentials() no se puede usar AllowAnyOrigin().
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        var corsBuilder = policy.AllowAnyMethod().AllowAnyHeader();
+        if (allowedOrigins.Length > 0)
+            corsBuilder.AllowCredentials().WithOrigins(allowedOrigins);
+        else
+            corsBuilder.AllowAnyOrigin();
+    });
+});
 
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.MapOpenApi();
+app.UseSwaggerUI(options =>
 {
-    app.MapOpenApi();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "MovieAPI v1");
-        options.SwaggerEndpoint("/openapi/v2.json", "MovieAPI v2");
-    });
-}
+    options.SwaggerEndpoint("/openapi/v1.json", "MovieAPI v1");
+    options.SwaggerEndpoint("/openapi/v2.json", "MovieAPI v2");
+    options.RoutePrefix = "swagger";
+});
 
 // Static File Support
 app.UseStaticFiles();

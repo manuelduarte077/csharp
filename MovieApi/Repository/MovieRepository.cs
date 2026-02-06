@@ -14,9 +14,20 @@ public class MovieRepository : IMovieRepository
         _dbContext = dbContext;
     }
 
-    public ICollection<Movie> GetMovies()
+    public ICollection<Movie> GetMovies(
+        int pageNumber,
+        int pageSize
+    )
     {
-        return _dbContext.Movies.OrderBy(m => m.Title).ToList();
+        return _dbContext.Movies.OrderBy(m => m.Title)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    public int GetMoviesCount()
+    {
+        return _dbContext.Movies.Count();
     }
 
     public ICollection<Movie> GetMoviesByCategory(int categoryId)

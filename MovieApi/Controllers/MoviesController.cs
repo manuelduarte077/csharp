@@ -27,17 +27,37 @@ namespace MovieApi.Controllers
         [ResponseCache(Duration = 20)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult GetMovies()
+        public IActionResult GetMovies([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var moviesList = _movieRepo.GetMovies();
-            var movieDto = new List<MovieDto>();
-
-            foreach (var list in moviesList)
+            try
             {
-                movieDto.Add(_mapper.Map<MovieDto>(list));
-            }
+                var totalCount = _movieRepo.GetMoviesCount();
+                var moviesList = _movieRepo.GetMovies(
+                    pageNumber,
+                    pageSize
+                );
 
-            return Ok(movieDto);
+                if (moviesList == null || !moviesList.Any())
+                {
+                    return NotFound($"Movies with id {pageNumber} not found");
+                }
+
+                var movieDto = moviesList.Select(movie => _mapper.Map<MovieDto>(movie)).ToList();
+                var result = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                    TotalCount = totalCount,
+                    Items = movieDto
+                };
+
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
         }
 
         [AllowAnonymous]
@@ -65,19 +85,22 @@ namespace MovieApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetMoviesByCategory(int categoryId)
         {
-            var moviesList = _movieRepo.GetMoviesByCategory(categoryId);
-            if (moviesList == null)
+            try
             {
-                return NotFound();
-            }
+                var moviesList = _movieRepo.GetMoviesByCategory(categoryId);
+                if (moviesList == null || moviesList.Any())
+                {
+                    return NotFound($"Movies with id {categoryId} not found");
+                }
 
-            var movieItemDto = new List<MovieDto>();
-            foreach (var movie in moviesList)
+                var movieItemDto = moviesList.Select(movie => _mapper.Map<MovieDto>(movie)).ToList();
+
+                return Ok(movieItemDto);
+            }
+            catch (Exception e)
             {
-                movieItemDto.Add(_mapper.Map<MovieDto>(movie));
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
-
-            return Ok(movieItemDto);
         }
 
         [AllowAnonymous]
@@ -90,12 +113,13 @@ namespace MovieApi.Controllers
             try
             {
                 var result = _movieRepo.SearchMovies(query);
-                if (result.Any())
+                if (!result.Any())
                 {
-                    return Ok(result);
+                    return NotFound($"Movies with id {query} not found");
                 }
 
-                return NotFound();
+                var movieDto = _mapper.Map<MovieDto>(result);
+                return Ok(movieDto);
             }
             catch (Exception)
             {
@@ -199,7 +223,8 @@ namespace MovieApi.Controllers
                     updateMovieDto.Image.CopyTo(fileStream);
                 }
 
-                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value?.TrimEnd('/')}";
+                var baseUrl =
+                    $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value?.TrimEnd('/')}";
                 movie.ImageUrl = baseUrl + "/images/" + fileName;
                 movie.LocationImageUrl = Path.Combine("wwwroot", "images", fileName);
             }
