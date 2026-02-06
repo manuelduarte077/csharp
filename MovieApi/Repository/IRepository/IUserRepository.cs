@@ -5,15 +5,13 @@ namespace MovieApi.Repository.IRepository;
 
 public interface IUserRepository
 {
-    
-    ICollection<User> GetAll();
-    
-    User GetById(int id);
-    
+    ICollection<AppUser> GetAll();
+
+    AppUser GetById(string id);
+
     bool IsUniqueUsername(string username);
-    
+
     Task<LoginUserResponseDto> Login(LoginUserDto loginUserDto);
-    
-    Task<User> Register(RegisterUserDto registerUserDto);
-    
+
+    Task<DataUserDto> Register(RegisterUserDto registerUserDto);
 }

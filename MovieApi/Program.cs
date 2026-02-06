@@ -1,11 +1,13 @@
 using System.Text;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MovieApi.Data;
 using MovieApi.MapperMovie;
+using MovieApi.Models;
 using MovieApi.OpenApi;
 using MovieApi.Repository;
 using MovieApi.Repository.IRepository;
@@ -23,6 +25,10 @@ builder.Services.AddControllers(options =>
         Duration = 60
     });
 });
+
+// .NET Identity
+builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+
 
 // Cache
 builder.Services.AddResponseCaching();

@@ -44,13 +44,13 @@ public class UsersController : ControllerBase
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpGet("{id:int}", Name = "GetUser")]
+    [HttpGet("{id}", Name = "GetUser")]
     [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult GetUser(int id)
+    public IActionResult GetUser(string id)
     {
         var userItem = _userRepo.GetById(id);
         if (userItem == null)
