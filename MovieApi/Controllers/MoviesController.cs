@@ -105,12 +105,13 @@ namespace MovieApi.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
+        [Consumes("multipart/form-data", "application/x-www-form-urlencoded")]
         [ProducesResponseType(201, Type = typeof(MovieDto))]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult CreateMovie([FromBody] CreateMovieDto createMovieDto)
+        public IActionResult CreateMovie([FromForm] CreateMovieDto createMovieDto)
         {
             if (!ModelState.IsValid)
             {
@@ -129,40 +130,80 @@ namespace MovieApi.Controllers
             }
 
             var movie = _mapper.Map<Movie>(createMovieDto);
-            if (!_movieRepo.MovieCreate(movie))
+
+            // Upload File → wwwroot/images
+            if (createMovieDto.Image != null)
             {
-                ModelState.AddModelError("", $"Movie create failed: {movie.Title}");
-                return StatusCode(404, ModelState);
+                string fileName = Guid.NewGuid() + Path.GetExtension(createMovieDto.Image.FileName);
+                string imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                Directory.CreateDirectory(imagesFolder);
+                string locationPath = Path.Combine(imagesFolder, fileName);
+
+                using (var fileStream = new FileStream(locationPath, FileMode.Create))
+                {
+                    createMovieDto.Image.CopyTo(fileStream);
+                }
+
+                var baseUrl =
+                    $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value?.TrimEnd('/')}";
+                movie.ImageUrl = baseUrl + "/images/" + fileName;
+                movie.LocationImageUrl = Path.Combine("wwwroot", "images", fileName);
+            }
+            else
+            {
+                movie.ImageUrl = "https://placehold.co/600x400";
             }
 
+            _movieRepo.MovieCreate(movie);
             return CreatedAtRoute("GetMovie", new { id = movie.Id }, movie);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPatch("{id:int}", Name = "UpdateMovie")]
+        [Consumes("multipart/form-data", "application/x-www-form-urlencoded")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult UpdateMovie(int id, [FromBody] MovieDto movieDto)
+        public IActionResult UpdateMovie(int id, [FromForm] UpdateMovieDto updateMovieDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (movieDto == null || id != movieDto.Id)
+            if (updateMovieDto == null || id != updateMovieDto.Id)
             {
                 return BadRequest(ModelState);
             }
 
-            var movieExists = _movieRepo.GetMovie(id);
-            if (movieExists == null)
+            var movie = _movieRepo.GetMovie(id);
+            if (movie == null)
             {
-                return NotFound($"No movie found with id");
+                return NotFound("No movie found with id");
             }
 
-            var movie = _mapper.Map<Movie>(movieDto);
+            // Actualizar propiedades desde el DTO
+            _mapper.Map(updateMovieDto, movie);
+
+            // Upload File → wwwroot/images
+            if (updateMovieDto.Image != null)
+            {
+                string fileName = Guid.NewGuid() + Path.GetExtension(updateMovieDto.Image.FileName);
+                string imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                Directory.CreateDirectory(imagesFolder);
+                string locationPath = Path.Combine(imagesFolder, fileName);
+
+                using (var fileStream = new FileStream(locationPath, FileMode.Create))
+                {
+                    updateMovieDto.Image.CopyTo(fileStream);
+                }
+
+                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value?.TrimEnd('/')}";
+                movie.ImageUrl = baseUrl + "/images/" + fileName;
+                movie.LocationImageUrl = Path.Combine("wwwroot", "images", fileName);
+            }
+
             if (!_movieRepo.MovieUpdate(movie))
             {
                 ModelState.AddModelError("", $"Movie update failed: {movie.Title}");

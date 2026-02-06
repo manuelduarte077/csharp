@@ -11,7 +11,8 @@ public class Movie
     public string Description { get; set; }
     public int Duration { get; set; }
     public string Language { get; set; }
-    public string ImageUrl { get; set; }
+    public string? ImageUrl { get; set; }
+    public string? LocationImageUrl { get; set; }
     public string ReleaseDate { get; set; }
     public ClassificationType Classification { get; set; }
     public DateTime CreatedDate { get; set; }

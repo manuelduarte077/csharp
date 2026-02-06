@@ -13,6 +13,7 @@ public class MapperMovies : Profile
 
         CreateMap<Movie, MovieDto>().ReverseMap();
         CreateMap<Movie, CreateMovieDto>().ReverseMap();
+        CreateMap<Movie, UpdateMovieDto>().ReverseMap();
 
         CreateMap<AppUser, DataUserDto>().ReverseMap();
         CreateMap<AppUser, UserDto>().ReverseMap();

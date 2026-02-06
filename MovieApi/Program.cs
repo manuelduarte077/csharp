@@ -105,6 +105,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Static File Support
+app.UseStaticFiles();
+
 app.UseHttpsRedirection();
 
 app.UseCors("CorsPolicy");
